@@ -16,10 +16,10 @@
 #define PIN_DIN      35
 #define PIN_PA_EN    21
 
-#define BATTERY_ADC_PIN 34
-#define TEMT6000_ADC_PIN 39
+//#define BATTERY_ADC_PIN 34
+//#define TEMT6000_ADC_PIN 39
 #define LED_PIN 15
-#define KEEP_ALIVE_PIN 23
+//#define KEEP_ALIVE_PIN 23
 //#define AUX_PIN 5 
 
 #define BT_DEVICE_NAME "CatPhones-7.2"
@@ -42,14 +42,14 @@ void setup() {
   Serial.begin(115200);
   delay(500);
   Serial.println("boot");
-  pinMode(KEEP_ALIVE_PIN, OUTPUT);
-  digitalWrite(KEEP_ALIVE_PIN, HIGH);  // keep the ESP32 awake
+  //pinMode(KEEP_ALIVE_PIN, OUTPUT);
+  //digitalWrite(KEEP_ALIVE_PIN, HIGH);  // keep the ESP32 awake
 
   //pinMode(LED_PIN, OUTPUT);
   //digitalWrite(LED_PIN, LOW);
-  analogSetPinAttenuation(BATTERY_ADC_PIN, ADC_11db);
-  pinMode(TEMT6000_ADC_PIN, INPUT);
-  analogSetPinAttenuation(TEMT6000_ADC_PIN, ADC_11db);
+  //analogSetPinAttenuation(BATTERY_ADC_PIN, ADC_11db);
+  //pinMode(TEMT6000_ADC_PIN, INPUT);
+  //analogSetPinAttenuation(TEMT6000_ADC_PIN, ADC_11db);
   //pinMode(AUX_PIN, INPUT_PULLUP);
     
     
@@ -88,20 +88,20 @@ void loop() {
 
   analogWrite(LED_PIN, 200);
 
-  uint32_t adcMilliVolts = analogReadMilliVolts(BATTERY_ADC_PIN);
-  float batteryVoltage = (adcMilliVolts * 2.0f) / 1000.0f;
-  uint32_t lightMilliVolts = analogReadMilliVolts(TEMT6000_ADC_PIN);
-  uint16_t lightAdc = analogRead(TEMT6000_ADC_PIN);
-  Serial.printf("Battery: %.2f V | B rightness: %u ADC, %u mV\n", batteryVoltage, lightAdc, lightMilliVolts);
+  //uint32_t adcMilliVolts = analogReadMilliVolts(BATTERY_ADC_PIN);
+  //float batteryVoltage = (adcMilliVolts * 2.0f) / 1000.0f;
+  //uint32_t lightMilliVolts = analogReadMilliVolts(TEMT6000_ADC_PIN);
+  //uint16_t lightAdc = analogRead(TEMT6000_ADC_PIN);
+  //Serial.printf("Battery: %.2f V | B rightness: %u ADC, %u mV\n", batteryVoltage, lightAdc, lightMilliVolts);
 
-  if (batteryVoltage < 2.9f) {
-    Serial.println("Battery low, shutting down...");
-    analogWrite(LED_PIN, 0);
-    delay(1000);
-    digitalWrite(KEEP_ALIVE_PIN, LOW);  // allow the ESP32 to sleep
-  } 
-  if (digitalRead(AUX_PIN) == LOW) {
-    Serial.println("AUX cable detected");
-  }
+  //if (batteryVoltage < 2.9f) {
+    //Serial.println("Battery low, shutting down...");
+    //analogWrite(LED_PIN, 0);
+    //delay(1000);
+    //digitalWrite(KEEP_ALIVE_PIN, LOW);  // allow the ESP32 to sleep
+  //} 
+  //if (digitalRead(AUX_PIN) == LOW) {
+    //Serial.println("AUX cable detected");
+  //}
 
 }
