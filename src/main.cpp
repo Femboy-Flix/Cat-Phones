@@ -20,23 +20,20 @@
 #define TEMT6000_ADC_PIN 39
 #define LED_PIN 15
 #define KEEP_ALIVE_PIN 23
-//#define AUX_PIN 5 
+#define AUX_PIN 5 
 
 #define BT_DEVICE_NAME "CatPhones-7.2"
 
-//inputs (battery-Voltage, light sensor, aux cable detection, Bluetooth audio, MIC input)
+const char* bands[] = { 
+  "Ramstein",
+  "TBK"
+};
+int NumberofBands = sizeof(bands) / sizeof(bands[0]);
 
 DriverPins pins;
 AudioBoard *board = nullptr;
 I2SCodecStream *i2s = nullptr;
 BluetoothA2DPSink *a2dp_sink = nullptr;
-
-// Receives metadata: track title, artist, album, duration, etc.
-void avrc_metadata_callback(uint8_t attribute_id, const uint8_t *data) {
-    // attribute_id identifies which metadata field (ESP_AVRC_MD_ATTR_*)
-    // data is null-terminated string with the value
-    Serial.printf("AVRC metadata: attr 0x%x = %s\n", attribute_id, data);
-}
 
 void setup() {
   Serial.begin(115200);
@@ -44,6 +41,13 @@ void setup() {
   Serial.println("boot");
   pinMode(KEEP_ALIVE_PIN, OUTPUT);
   digitalWrite(KEEP_ALIVE_PIN, HIGH);  // keep the ESP32 awake
+
+  a2dp_sink->set_avrc_metadata_attribute_mask(
+  ESP_AVRC_MD_ATTR_ARTIST |
+  ESP_AVRC_MD_ATTR_TITLE |
+  ESP_AVRC_MD_ATTR_ALBUM |
+  ESP_AVRC_MD_ATTR_PLAYING_TIME
+  );
 
   //pinMode(LED_PIN, OUTPUT);
   //digitalWrite(LED_PIN, LOW);
@@ -67,6 +71,7 @@ void setup() {
   Serial.println("starting i2s/codec");
   if (!i2s->begin(cfg)) Serial.println("i2s begin FAILED");
   i2s->setVolume(1);
+
   
   a2dp_sink = new BluetoothA2DPSink(*i2s);
   a2dp_sink->set_on_volumechange([](int v) { i2s->setVolume(v / 127.0f); });
@@ -81,6 +86,22 @@ void setup() {
   // After connection established, reduce CPU frequency
   setCpuFrequencyMhz(80);  // Down from 240MHz
 }
+
+
+//Search Metadata for bands to skip 
+  void avrc_metadata_callback(uint8_t attribute_id, const uint8_t *data) {
+    if (data == nullptr) return;
+    if (attribute_id == ESP_AVRC_MD_ATTR_ARTIST) {
+      const char* artist = (const char*)data;
+      for (int i = 0; i < NumberofBands; i++) {
+        if (strstr(artist, bands[i]) != nullptr) {
+          Serial.printf("Band gefunden: %s\n", bands[i]);
+          a2dp_sink->next();  // forward playback
+        }
+      }
+    }
+  }
+
 
 void loop() {
    
@@ -103,5 +124,4 @@ void loop() {
   if (digitalRead(AUX_PIN) == LOW) {
     Serial.println("AUX cable detected");
   }
-
 }
