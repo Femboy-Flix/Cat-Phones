@@ -22,7 +22,7 @@
 //#define KEEP_ALIVE_PIN 23
 //#define AUX_PIN 5 
 
-#define BT_DEVICE_NAME "CatPhones-7.2"
+#define BT_DEVICE_NAME "CatPhones"
 
 //inputs (battery-Voltage, light sensor, aux cable detection, Bluetooth audio, MIC input)
 
